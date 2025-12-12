@@ -14,7 +14,7 @@ if(isset($_POST['daftar'])){
         $query = mysqli_query($conn, "INSERT INTO users (username, password) VALUES ('$username', '$password')");
         
         if($query){
-            echo "<script>alert('Pendaftaran Berhasil! Silakan Login.'); window.location='login.php';</script>";
+            $registrasi_berhasil = true;
         } else {
             echo "<script>alert('Gagal daftar. Terjadi kesalahan database.');</script>";
         }
@@ -36,7 +36,6 @@ if(isset($_POST['daftar'])){
 
         body {
             font-family: 'Poppins', sans-serif;
-            font-family: 'Poppins', sans-serif;
             background-image: url('asset/bg_kedua.png');
             background-size: cover;      
             background-position: center; 
@@ -53,7 +52,8 @@ if(isset($_POST['daftar'])){
         }
 
         .nav-left { display: flex; align-items: center; gap: 40px; }
-        .logo { font-size: 24px; font-weight: 800; color: #1a2e35; }
+        .logo { font-size: 24px; font-weight: 800; color: #ffea00ff; display: flex; align-items: center; }
+        .logo-img { height: 50px; width: auto; margin-right: 5px; vertical-align: middle; }
         
         .nav-links a, .nav-right a {
             color: #1a2e35; font-weight: 600; font-size: 16px; transition: color 0.3s;
@@ -61,22 +61,6 @@ if(isset($_POST['daftar'])){
         .nav-links a { margin-right: 25px; }
         .nav-right a { margin-left: 20px; }
         .nav-links a:hover, .nav-right a:hover { color: #fff; }
-
-        .logo-img {
-        height: 50px; 
-        width: auto; 
-        margin-right: 5px; 
-        vertical-align: middle; 
-        }
-
-        .logo {
-        font-size: 24px;
-        font-weight: 800;
-        color: #ffea00ff;
-        display: flex; 
-        align-items: center; 
-
-        }
 
         .register-container {
             flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px;
@@ -111,6 +95,27 @@ if(isset($_POST['daftar'])){
         }
 
         .btn-submit:hover { background-color: #2eb858; }
+            
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;
+            z-index: 9999; visibility: hidden; opacity: 0; transition: 0.3s;
+        }
+        .modal-show { visibility: visible; opacity: 1; }
+        .modal-box {
+            background: white; padding: 30px; border-radius: 20px;
+            width: 90%; max-width: 350px; text-align: center;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            transform: scale(0.8); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-show .modal-box { transform: scale(1); }
+        .modal-icon { width: 60px; height: 60px; margin-bottom: 15px; }
+        .modal-title { font-size: 20px; font-weight: 700; color: #1a2e35; margin-bottom: 10px; font-family: 'Merriweather', serif; }
+        .modal-desc { font-size: 14px; color: #666; margin-bottom: 25px; font-family: 'Poppins', sans-serif;}
+        .btn-modal {
+            padding: 10px 30px; border-radius: 50px; border: none; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; font-family: 'Poppins', sans-serif;
+        }
+        .btn-green { background-color: #3CCF68; color: white; }
     </style>
 </head>
 <body>
@@ -150,6 +155,19 @@ if(isset($_POST['daftar'])){
             </form>
         </div>
     </main>
+
+    <?php if(isset($registrasi_berhasil)): ?>
+    <div class="modal-overlay modal-show">
+        <div class="modal-box">
+            <svg class="modal-icon" viewBox="0 0 24 24" fill="#3CCF68">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+            <div class="modal-title">Registrasi Berhasil!</div>
+            <p class="modal-desc">Akun Anda telah dibuat. Silakan login untuk melanjutkan.</p>
+            <a href="login.php" class="btn-modal btn-green">Login Sekarang</a>
+        </div>
+    </div>
+    <?php endif; ?>
 
 </body>
 </html>
