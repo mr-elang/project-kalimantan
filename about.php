@@ -153,23 +153,23 @@ session_start();
             
             <div class="team-member">
                 <div class="photo-box">
-                    <img src="https://via.placeholder.com/250x250?text=Foto+Rinaldi" alt="Rinaldi">
+                    <img src="asset/teams/rinaldi.jpg" alt="Rinaldi">
                 </div>
-                <div class="member-info">Rinaldi - H1d0240</div>
+                <div class="member-info">Rinaldi - H1D0240</div>
             </div>
 
             <div class="team-member">
                 <div class="photo-box">
-                    <img src="https://via.placeholder.com/250x250?text=Foto+Farhan" alt="Farhan">
+                    <img src="asset/teams/farhan.jpg" alt="Farhan">
                 </div>
-                <div class="member-info">Farhan - H1d0240</div>
+                <div class="member-info">Farhan - H1D0240</div>
             </div>
 
             <div class="team-member">
                 <div class="photo-box">
-                    <img src="https://via.placeholder.com/250x250?text=Foto+Elang" alt="Elang">
+                    <img src="asset/teams/elang.jpg" alt="Elang">
                 </div>
-                <div class="member-info">Elang - H1d0240</div>
+                <div class="member-info">Elang - H1D0240</div>
             </div>
 
         </div>
