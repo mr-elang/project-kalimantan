@@ -2,20 +2,32 @@
 include 'koneksi.php';
 session_start();
 
-if(!isset($_SESSION['status'])){
+if(!isset($_SESSION['status']) || $_SESSION['status'] != 'login'){
     header("Location: login.php");
     exit;
 }
 
+if(!isset($_GET['id'])){
+    header("Location: contents.php");
+    exit;
+}
+
 $id = $_GET['id'];
-$user_id_session = $_SESSION['user_id'];
+$user_id = $_SESSION['user_id'];
 
-// Hapus data HANYA JIKA id konten cocok DAN user_id nya cocok dengan session (Keamanan)
-$hapus = mysqli_query($conn, "DELETE FROM contents WHERE id = '$id' AND user_id = '$user_id_session'");
+$cek = mysqli_query($conn, "SELECT * FROM contents WHERE id = '$id' AND user_id = '$user_id'");
 
-if(mysqli_affected_rows($conn) > 0){
-    echo "<script>alert('Data berhasil dihapus!'); window.location='contents.php';</script>";
+if(mysqli_num_rows($cek) > 0){
+    $hapus = mysqli_query($conn, "DELETE FROM contents WHERE id = '$id'");
+    mysqli_query($conn, "DELETE FROM komentar WHERE content_id = '$id'");
+    
+    if($hapus){
+        header("Location: contents.php?pesan=hapus");
+        exit;
+    } else {
+        echo "<script>alert('Gagal menghapus data db.'); window.location='contents.php';</script>";
+    }
 } else {
-    echo "<script>alert('Gagal menghapus data (Mungkin bukan punya Anda).'); window.location='contents.php';</script>";
+    echo "<script>alert('Anda tidak berhak menghapus konten ini.'); window.location='contents.php';</script>";
 }
 ?>

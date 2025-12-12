@@ -1,93 +1,189 @@
 <?php
-include 'koneksi.php';
 session_start();
+include 'koneksi.php';
+
+if(isset($_GET['cari'])){
+    $keyword = $_GET['cari'];
+    $query = mysqli_query($conn, "SELECT * FROM contents WHERE nama LIKE '%$keyword%' OR tipe LIKE '%$keyword%' ORDER BY id DESC");
+} else {
+    $query = mysqli_query($conn, "SELECT * FROM contents ORDER BY id DESC");
+}
 ?>
+
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>Daftar Isi - BorneoPedia</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BorneoPedia - Contents</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
     <style>
-        .card-img-top { height: 200px; object-fit: cover; transition: 0.3s; }
-        .card:hover .card-img-top { transform: scale(1.05); }
-        .card { overflow: hidden; }
+        * { margin: 0; padding: 0; box-sizing: border-box; text-decoration: none; }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-image: url('asset/bg_kedua.png');
+            background-size: cover; background-position: center; background-repeat: no-repeat;
+            min-height: 100vh;
+            display: flex; flex-direction: column;
+        }
+        nav {
+            background-color: #2F9E58;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 50px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .nav-left { display: flex; align-items: center; gap: 40px; }
+        .logo { font-size: 24px; font-weight: 800; color: #ffea00ff; display: flex; align-items: center; }
+        .logo-img { height: 50px; width: auto; margin-right: 5px; vertical-align: middle; }
+        
+        .nav-links a, .nav-right a, .nav-right span {
+            color: #1a2e35; font-weight: 600; font-size: 16px; transition: color 0.3s;
+        }
+        .nav-links a { margin-right: 25px; } .nav-right a { margin-left: 20px; }
+        .nav-links a:hover, .nav-right a:hover { color: #fff; }
+
+        .content-container {
+            flex: 1; padding: 50px 50px; display: flex; flex-direction: column; align-items: center;
+        }
+
+        .content-container h1 {
+            font-family: 'Poppins', serif; color: #ffff; font-size: 50px; margin-bottom: 30px;
+        }
+
+        .search-box {
+            background: white; width: 100%; max-width: 600px;
+            border-radius: 50px; padding: 5px; display: flex;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 50px;
+        }
+        .search-box input {
+            flex: 1; border: none; outline: none; padding: 15px 25px;
+            border-radius: 50px; font-family: 'Poppins', sans-serif; font-size: 16px;
+        }
+        .search-box button {
+            background-color: #3CCF68; color: white; border: none;
+            padding: 10px 40px; border-radius: 50px; font-weight: 600; cursor: pointer;
+        }
+        .search-box button:hover { background-color: #2eb858; }
+
+        .grid-container {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px; width: 100%; max-width: 1200px;
+        }
+
+        .card {
+            background: white; border-radius: 20px; overflow: hidden;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05); transition: transform 0.3s;
+            display: flex; flex-direction: column;
+        }
+        .card:hover { transform: translateY(-5px); }
+        .card-img { width: 100%; height: 200px; object-fit: cover; background-color: #eee; }
+
+        .card-body { padding: 20px; display: flex; flex-direction: column; flex: 1; }
+
+        .badge-type {
+            background-color: #e6f7ed; color: #2F9E58; padding: 5px 12px;
+            border-radius: 20px; font-size: 12px; font-weight: 600;
+            align-self: flex-start; margin-bottom: 10px;
+        }
+        .card-title { font-family: 'Merriweather', serif; font-size: 18px; color: #1a2e35; margin-bottom: 10px; }
+        .card-desc {
+            font-size: 14px; color: #666; margin-bottom: 20px;
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; flex: 1;
+        }
+        .btn-detail {
+            text-align: center; background-color: #2F9E58; color: white; padding: 10px;
+            border-radius: 50px; font-size: 14px; font-weight: 600; margin-top: auto;
+        }
+        .btn-detail:hover { background-color: #258548; }
+
+        .empty-msg { color: #888; font-style: italic; margin-top: 20px; }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;
+            z-index: 9999; visibility: hidden; opacity: 0; transition: 0.3s;
+        }
+        .modal-show { visibility: visible; opacity: 1; }
+        .modal-box {
+            background: white; padding: 30px; border-radius: 20px;
+            width: 90%; max-width: 350px; text-align: center;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+            transform: scale(0.8); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .modal-show .modal-box { transform: scale(1); }
+        .modal-icon { width: 60px; height: 60px; margin-bottom: 15px; }
+        .modal-title { font-size: 20px; font-weight: 700; color: #1a2e35; margin-bottom: 10px; font-family: 'Merriweather', serif; }
+        .modal-desc { font-size: 14px; color: #666; margin-bottom: 25px; font-family: 'Poppins', sans-serif;}
+
+        .btn-modal { padding: 10px 30px; border-radius: 50px; border: none; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; font-family: 'Poppins', sans-serif; }
+        .btn-green { background-color: #3CCF68; color: white; }
     </style>
 </head>
-<body class="bg-light">
-    <?php include 'navbar.php'; ?>
-    
-    <div class="container mt-4">
-        <h2 class="text-center mb-4 text-success border-bottom pb-2">Ensiklopedia Kalimantan</h2>
-        
-        <form action="" method="GET" class="mb-4">
-            <div class="input-group" style="max-width: 500px; margin: 0 auto;">
-                <input type="text" name="cari" class="form-control" placeholder="Cari kuliner, budaya, flora..." value="<?= isset($_GET['cari']) ? $_GET['cari'] : '' ?>">
-                <button type="submit" class="btn btn-success">Cari</button>
+<body>
+
+    <nav>
+        <div class="nav-left">
+             <a href="index.php" class="logo">
+            <img src="asset/logofix.png" class="logo-img"> BorneoPedia</a>
+            <div class="nav-links">
+                <a href="index.php">Home</a>
+                <a href="about.php">About Us</a>
+                <a href="contents.php">Contents</a>
             </div>
+        </div>
+        <div class="nav-right">
+            <?php if(isset($_SESSION['status']) && $_SESSION['status'] == 'login'): ?>
+                <span>Hi, <?php echo $_SESSION['username']; ?></span>
+                <a href="upload.php">Upload +</a>
+                <a href="logout.php">Logout</a>
+            <?php else: ?>
+                <a href="login.php">Login</a>
+                <a href="register.php">Daftar</a>
+            <?php endif; ?>
+        </div>
+    </nav>
+
+    <main class="content-container">
+        <h1>KONTEN ENSIKLOPEDIA</h1>
+
+        <form action="" method="GET" class="search-box">
+            <input type="text" name="cari" placeholder="Cari budaya, makanan..." value="<?php echo isset($_GET['cari']) ? $_GET['cari'] : ''; ?>">
+            <button type="submit">Cari</button>
         </form>
 
-        <div class="row">
-        <?php
-        // LOGIKA PENCARIAN
-        if(isset($_GET['cari'])){
-            $keyword = $_GET['cari'];
-            $query = mysqli_query($conn, "SELECT * FROM contents WHERE nama LIKE '%$keyword%' OR tipe LIKE '%$keyword%' ORDER BY id DESC");
-        } else {
-            $query = mysqli_query($conn, "SELECT * FROM contents ORDER BY id DESC");
-        }
-
-        if(mysqli_num_rows($query) == 0){
-            echo '<div class="col-12 text-center text-muted">Data tidak ditemukan.</div>';
-        }
-        
-        while($data = mysqli_fetch_array($query)){
-            // LOGIKA GAMBAR PINTAR
-            $foto_db = $data['foto'];
-            if (strpos($foto_db, 'http') === 0) {
-                $src_gambar = $foto_db; 
-            } else {
-                $src_gambar = "uploads/" . $foto_db;
-            }
-        ?>
-        
-            <div class="col-md-4 mb-4">
-                <div class="card shadow h-100 border-0">
-                    <a href="detail.php?id=<?= $data['id'] ?>">
-                        <img src="<?= htmlspecialchars($src_gambar) ?>" class="card-img-top" alt="Gambar">
-                    </a>
-                    
-                    <div class="card-body d-flex flex-column">
-                        <span class="badge bg-success w-25 mb-2"><?= $data['tipe'] ?></span>
-                        
-                        <h5 class="card-title fw-bold">
-                            <a href="detail.php?id=<?= $data['id'] ?>" class="text-decoration-none text-dark">
-                                <?= htmlspecialchars($data['nama']) ?>
-                            </a>
-                        </h5>
-                        
-                        <p class="card-text text-muted">
-                            <?= substr(htmlspecialchars($data['informasi']), 0, 100) ?>...
-                        </p>
-                        
-                        <div class="mt-auto">
-                            <a href="detail.php?id=<?= $data['id'] ?>" class="btn btn-outline-success w-100 mb-2">Baca Selengkapnya &rarr;</a>
-
-                            <!-- PERBAIKAN DI SINI: ganti $data['id'] jadi $data['user_id'] -->
-                            <?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $data['user_id']): ?>
-                                <div class="d-flex gap-2">
-                                    <a href="edit.php?id=<?= $data['id'] ?>" class="btn btn-info btn-sm w-50 text-white">Edit</a>
-                                    <a href="delete.php?id=<?= $data['id'] ?>" class="btn btn-danger btn-sm w-50" onclick="return confirm('Yakin ingin menghapus postingan ini?')">Hapus</a>
-                                </div>
-                            <?php endif; ?>
-                            
+        <div class="grid-container">
+            <?php if(mysqli_num_rows($query) > 0): ?>
+                <?php while($row = mysqli_fetch_assoc($query)): ?>
+                    <div class="card">
+                        <img src="<?php echo $row['foto']; ?>" alt="Gambar" class="card-img" onerror="this.src='https://via.placeholder.com/400x200?text=No+Image'">
+                        <div class="card-body">
+                            <span class="badge-type"><?php echo $row['tipe']; ?></span>
+                            <h3 class="card-title"><?php echo $row['nama']; ?></h3>
+                            <p class="card-desc"><?php echo $row['informasi']; ?></p>
+                            <a href="detail.php?id=<?php echo $row['id']; ?>" class="btn-detail">Baca Selengkapnya</a>
                         </div>
                     </div>
-                </div>
-            </div>
-        <?php } ?>
+                <?php endwhile; ?>
+            <?php else: ?>
+                </div> <p class="empty-msg">Data tidak ditemukan atau belum ada konten yang diupload.</p>
+            <?php endif; ?>
+        </div>
+    </main>
+
+    <?php if(isset($_GET['pesan']) && $_GET['pesan'] == 'hapus'): ?>
+    <div class="modal-overlay modal-show">
+        <div class="modal-box">
+            <svg class="modal-icon" viewBox="0 0 24 24" fill="#3CCF68">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+            </svg>
+            <div class="modal-title">Terhapus!</div>
+            <p class="modal-desc">Yah udah dihapus</p>
+            <a href="contents.php" class="btn-modal btn-green">Oke</a>
         </div>
     </div>
-    
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <?php endif; ?>
+
 </body>
 </html>

@@ -4,43 +4,152 @@ session_start();
 
 if(isset($_POST['daftar'])){
     $username = $_POST['username'];
-    $password = password_hash($_POST['password'], PASSWORD_DEFAULT); // Enkripsi password
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
 
-    $query = mysqli_query($conn, "INSERT INTO users (username, password) VALUES ('$username', '$password')");
-    
-    if($query){
-        echo "<script>alert('Pendaftaran Berhasil! Silakan Login.'); window.location='login.php';</script>";
+    $cek_user = mysqli_query($conn, "SELECT * FROM users WHERE username = '$username'");
+
+    if(mysqli_num_rows($cek_user) > 0){
+         echo "<script>alert('Username sudah terdaftar! Gunakan username lain.');</script>";
     } else {
-        echo "<script>alert('Gagal daftar / Username sudah ada.');</script>";
+        $query = mysqli_query($conn, "INSERT INTO users (username, password) VALUES ('$username', '$password')");
+        
+        if($query){
+            echo "<script>alert('Pendaftaran Berhasil! Silakan Login.'); window.location='login.php';</script>";
+        } else {
+            echo "<script>alert('Gagal daftar. Terjadi kesalahan database.');</script>";
+        }
     }
 }
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>Register</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BorneoPedia - Registrasi</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; text-decoration: none; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            font-family: 'Poppins', sans-serif;
+            background-image: url('asset/bg_kedua.png');
+            background-size: cover;      
+            background-position: center; 
+            background-repeat: no-repeat; 
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        nav {
+            background-color: #2F9E58;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 20px 50px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .nav-left { display: flex; align-items: center; gap: 40px; }
+        .logo { font-size: 24px; font-weight: 800; color: #1a2e35; }
+        
+        .nav-links a, .nav-right a {
+            color: #1a2e35; font-weight: 600; font-size: 16px; transition: color 0.3s;
+        }
+        .nav-links a { margin-right: 25px; }
+        .nav-right a { margin-left: 20px; }
+        .nav-links a:hover, .nav-right a:hover { color: #fff; }
+
+        .logo-img {
+        height: 50px; 
+        width: auto; 
+        margin-right: 5px; 
+        vertical-align: middle; 
+        }
+
+        .logo {
+        font-size: 24px;
+        font-weight: 800;
+        color: #ffea00ff;
+        display: flex; 
+        align-items: center; 
+
+        }
+
+        .register-container {
+            flex: 1; display: flex; justify-content: center; align-items: center; padding: 20px;
+        }
+
+        .card-register {
+            background-color: white; padding: 40px 50px; border-radius: 20px;
+            width: 100%; max-width: 450px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); text-align: center;
+        }
+
+        .card-register h2 {
+            font-family: 'Merriweather', serif; color: #2F9E58; font-size: 28px; margin-bottom: 30px;
+        }
+
+        .form-group { text-align: left; margin-bottom: 20px; }
+        .form-group label { display: block; color: #1a2e35; font-weight: 600; margin-bottom: 8px; font-size: 14px; }
+
+        .form-group input {
+            width: 100%; padding: 12px 20px; border-radius: 50px;
+            border: 1px solid #ddd; background-color: #fff;
+            font-family: 'Poppins', sans-serif; font-size: 14px; outline: none;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05); transition: border 0.3s;
+        }
+
+        .form-group input:focus { border-color: #3CCF68; }
+
+        .btn-submit {
+            width: 100%; background-color: #3CCF68; color: white; padding: 12px;
+            border: none; border-radius: 50px; font-weight: 600; font-size: 16px;
+            cursor: pointer; margin-top: 10px;
+            box-shadow: 0 4px 10px rgba(60, 207, 104, 0.3); transition: background 0.3s;
+        }
+
+        .btn-submit:hover { background-color: #2eb858; }
+    </style>
 </head>
-<body class="bg-light">
-    <?php include 'navbar.php'; ?>
-    <div class="container" style="max-width: 400px; margin-top: 50px;">
-        <div class="card shadow">
-            <div class="card-body">
-                <h3 class="text-center text-success">Registrasi</h3>
-                <form method="POST">
-                    <div class="mb-3">
-                        <label>Username</label>
-                        <input type="text" name="username" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label>Password</label>
-                        <input type="password" name="password" class="form-control" required>
-                    </div>
-                    <button type="submit" name="daftar" class="btn btn-success w-100">Daftar</button>
-                </form>
+<body>
+
+    <nav>
+        <div class="nav-left">
+             <a href="index.php" class="logo">
+            <img src="asset/logofix.png" class="logo-img"> BorneoPedia</a>
+            <div class="nav-links">
+                <a href="index.php">Home</a>
+                <a href="about.php">About Us</a>
+                <a href="contents.php">Contents</a>
             </div>
         </div>
-    </div>
+        <div class="nav-right">
+            <a href="login.php">Login</a>
+            <a href="register.php">Daftar</a>
+        </div>
+    </nav>
+
+    <main class="register-container">
+        <div class="card-register">
+            <h2>Registrasi</h2>
+            
+            <form action="" method="POST">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Masukan Username" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Masukan Password" required>
+                </div>
+
+                <button type="submit" name="daftar" class="btn-submit">Daftar</button>
+            </form>
+        </div>
+    </main>
+
 </body>
 </html>
