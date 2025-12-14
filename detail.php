@@ -2,12 +2,14 @@
 session_start();
 include 'koneksi.php';
 
+// Cek apakah ada ID di URL
 if(!isset($_GET['id'])){
     header("Location: contents.php");
     exit;
 }
 $id_content = $_GET['id'];
 
+// Logika Kirim Komentar
 if(isset($_POST['kirim_komentar'])){
     if(!isset($_SESSION['status'])){
         echo "<script>alert('Anda harus login untuk berkomentar!'); window.location='login.php';</script>";
@@ -21,21 +23,25 @@ if(isset($_POST['kirim_komentar'])){
         $insert = mysqli_query($conn, "INSERT INTO komentar (content_id, user_id, isi) VALUES ('$id_content', '$user_id', '$isi')");
     }
     
+    // Refresh halaman agar komentar muncul
     header("Location: detail.php?id=$id_content");
     exit;
 }
 
+// Ambil Data Konten
 $query = mysqli_query($conn, "SELECT contents.*, users.username 
                               FROM contents 
                               JOIN users ON contents.user_id = users.id 
                               WHERE contents.id = '$id_content'");
 $data = mysqli_fetch_assoc($query);
 
+// Jika data tidak ditemukan
 if(!$data){
     echo "<script>alert('Data tidak ditemukan!'); window.location='contents.php';</script>";
     exit;
 }
 
+// Ambil Data Komentar
 $query_komen = mysqli_query($conn, "SELECT komentar.*, users.username 
                                     FROM komentar 
                                     JOIN users ON komentar.user_id = users.id 
@@ -53,21 +59,46 @@ $query_komen = mysqli_query($conn, "SELECT komentar.*, users.username
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
     <style>
+        /* RESET CSS GLOBAL */
         * { margin: 0; padding: 0; box-sizing: border-box; text-decoration: none; }
         
+        /* FIX WHITE SPACE: Reset html dan body agar memenuhi layar tanpa celah */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
+
         body {
             font-family: 'Poppins', sans-serif;
             background-image: url('asset/bg_kedua.png');
-            background-size: cover; background-position: center; background-repeat: no-repeat;
+            
+            /* BACKGROUND FIX: Agar background diam dan tidak zoom aneh */
+            background-attachment: fixed; 
+            background-size: cover; 
+            background-position: center; 
+            background-repeat: no-repeat;
+            
+            /* Pastikan body minimal setinggi layar */
             min-height: 100vh;
+            
             display: flex; flex-direction: column;
         }
 
+        /* NAVBAR STICKY */
         nav {
             background-color: #2F9E58;
             display: flex; justify-content: space-between; align-items: center;
-            padding: 20px 50px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px 50px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            
+            /* Agar nempel di atas */
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
+
         .nav-left { display: flex; align-items: center; gap: 40px; }
         .logo { font-size: 24px; font-weight: 800; color: #ffea00ff; display: flex; align-items: center; }
         .logo-img { height: 50px; width: auto; margin-right: 5px; vertical-align: middle; }
@@ -78,8 +109,13 @@ $query_komen = mysqli_query($conn, "SELECT komentar.*, users.username
         .nav-links a { margin-right: 25px; } .nav-right a { margin-left: 20px; }
         .nav-links a:hover, .nav-right a:hover { color: #fff; }
 
+        /* CONTAINER UTAMA */
         .detail-container {
-            flex: 1; padding: 50px 20px; display: flex; justify-content: center; align-items: flex-start;
+            flex: 1; 
+            padding: 50px 20px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-start;
         }
 
         .card-detail {
@@ -91,6 +127,7 @@ $query_komen = mysqli_query($conn, "SELECT komentar.*, users.username
 
         .detail-img { width: 100%; height: 450px; object-fit: cover; background-color: #eee; }
 
+        /* TOMBOL KEMBALI BULAT */
         .btn-back-arrow {
             position: absolute; top: 20px; left: 20px;
             background-color: rgba(255, 255, 255, 0.9);
@@ -129,6 +166,7 @@ $query_komen = mysqli_query($conn, "SELECT komentar.*, users.username
         .btn-edit { background-color: #0088ff; color: white; }
         .btn-delete { background-color: #ff4d4d; color: white; }
 
+        /* SECTION KOMENTAR */
         .comment-section { background-color: #f8fcf9; padding: 30px 40px; border-top: 1px solid #eee; }
         .comment-title { font-family: 'Merriweather', serif; font-size: 20px; color: #1a2e35; margin-bottom: 20px; }
         .comment-list { margin-bottom: 30px; }
@@ -151,7 +189,7 @@ $query_komen = mysqli_query($conn, "SELECT komentar.*, users.username
         .btn-send:hover { background-color: #00b5b8; }
         .icon-send { width: 20px; height: 20px; fill: white; margin-left: -2px; }
 
-        /* --- STYLE POPUP MODAL --- */
+        /* MODAL POPUP */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;

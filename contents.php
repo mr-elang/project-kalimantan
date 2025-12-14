@@ -25,15 +25,29 @@ if(isset($_GET['cari'])){
         body {
             font-family: 'Poppins', sans-serif;
             background-image: url('asset/bg_kedua.png');
-            background-size: cover; background-position: center; background-repeat: no-repeat;
+            
+            /* Background Fix: Supaya gambar background diam dan tidak zoom aneh saat scroll */
+            background-attachment: fixed; 
+            background-size: cover; 
+            background-position: center; 
+            background-repeat: no-repeat;
+            
             min-height: 100vh;
             display: flex; flex-direction: column;
         }
+
         nav {
             background-color: #2F9E58;
             display: flex; justify-content: space-between; align-items: center;
-            padding: 20px 50px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px 50px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            
+            /* Navbar Fix: Supaya navbar nempel di atas */
+            position: sticky;
+            top: 0;
+            z-index: 1000;
         }
+
         .nav-left { display: flex; align-items: center; gap: 40px; }
         .logo { font-size: 24px; font-weight: 800; color: #ffea00ff; display: flex; align-items: center; }
         .logo-img { height: 50px; width: auto; margin-right: 5px; vertical-align: middle; }
@@ -50,6 +64,7 @@ if(isset($_GET['cari'])){
 
         .content-container h1 {
             font-family: 'Poppins', serif; color: #ffff; font-size: 50px; margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
         .search-box {
@@ -92,33 +107,20 @@ if(isset($_GET['cari'])){
             font-size: 14px; color: #666; margin-bottom: 20px;
             display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; flex: 1;
         }
+        
+        /* Style Tombol Baca Selengkapnya */
         .btn-detail {
-            text-align: center; background-color: #2F9E58; color: white; padding: 10px;
-            border-radius: 50px; font-size: 14px; font-weight: 600; margin-top: auto;
+            text-align: center; background-color: #3CCF68; color: white; padding: 12px;
+            border-radius: 50px; font-size: 14px; font-weight: 700; margin-top: auto;
+            display: block; 
         }
         .btn-detail:hover { background-color: #258548; }
 
-        .empty-msg { color: #888; font-style: italic; margin-top: 20px; }
-
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;
-            z-index: 9999; visibility: hidden; opacity: 0; transition: 0.3s;
+        .empty-msg { 
+            color: #fff; font-style: italic; margin-top: 20px; 
+            background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 10px;
         }
-        .modal-show { visibility: visible; opacity: 1; }
-        .modal-box {
-            background: white; padding: 30px; border-radius: 20px;
-            width: 90%; max-width: 350px; text-align: center;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
-            transform: scale(0.8); transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        .modal-show .modal-box { transform: scale(1); }
-        .modal-icon { width: 60px; height: 60px; margin-bottom: 15px; }
-        .modal-title { font-size: 20px; font-weight: 700; color: #1a2e35; margin-bottom: 10px; font-family: 'Merriweather', serif; }
-        .modal-desc { font-size: 14px; color: #666; margin-bottom: 25px; font-family: 'Poppins', sans-serif;}
 
-        .btn-modal { padding: 10px 30px; border-radius: 50px; border: none; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; font-family: 'Poppins', sans-serif; }
-        .btn-green { background-color: #3CCF68; color: white; }
     </style>
 </head>
 <body>
@@ -158,32 +160,23 @@ if(isset($_GET['cari'])){
                 <?php while($row = mysqli_fetch_assoc($query)): ?>
                     <div class="card">
                         <img src="<?php echo $row['foto']; ?>" alt="Gambar" class="card-img" onerror="this.src='https://via.placeholder.com/400x200?text=No+Image'">
+                        
                         <div class="card-body">
                             <span class="badge-type"><?php echo $row['tipe']; ?></span>
                             <h3 class="card-title"><?php echo $row['nama']; ?></h3>
                             <p class="card-desc"><?php echo $row['informasi']; ?></p>
+                            
                             <a href="detail.php?id=<?php echo $row['id']; ?>" class="btn-detail">Baca Selengkapnya</a>
                         </div>
                     </div>
                 <?php endwhile; ?>
             <?php else: ?>
-                </div> <p class="empty-msg">Data tidak ditemukan atau belum ada konten yang diupload.</p>
+                </div> 
+                <p class="empty-msg">Data tidak ditemukan atau belum ada konten yang diupload.</p>
+                <div style="display:none"> 
             <?php endif; ?>
         </div>
     </main>
-
-    <?php if(isset($_GET['pesan']) && $_GET['pesan'] == 'hapus'): ?>
-    <div class="modal-overlay modal-show">
-        <div class="modal-box">
-            <svg class="modal-icon" viewBox="0 0 24 24" fill="#3CCF68">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-            </svg>
-            <div class="modal-title">Terhapus!</div>
-            <p class="modal-desc">Yah udah dihapus</p>
-            <a href="contents.php" class="btn-modal btn-green">Oke</a>
-        </div>
-    </div>
-    <?php endif; ?>
 
 </body>
 </html>
