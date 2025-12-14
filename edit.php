@@ -2,11 +2,13 @@
 include 'koneksi.php';
 session_start();
 
+// Cek Login
 if(!isset($_SESSION['status']) || $_SESSION['status'] != 'login'){
     header("Location: login.php");
     exit;
 }
 
+// Cek ID
 if(!isset($_GET['id'])){
     header("Location: contents.php");
     exit;
@@ -14,14 +16,17 @@ if(!isset($_GET['id'])){
 $id = $_GET['id'];
 $user_id_session = $_SESSION['user_id'];
 
+// Ambil Data (Hanya milik user yang login)
 $query = mysqli_query($conn, "SELECT * FROM contents WHERE id = '$id' AND user_id = '$user_id_session'");
 $data = mysqli_fetch_array($query);
 
+// Jika bukan pemiliknya, tendang keluar
 if(mysqli_num_rows($query) < 1){
     echo "<script>alert('Akses Ditolak! Anda bukan pemilik konten ini.'); window.location='contents.php';</script>";
     exit;
 }
 
+// Proses Update
 if(isset($_POST['update'])){
     $nama = $_POST['nama'];
     $tipe = $_POST['tipe'];
@@ -48,34 +53,65 @@ if(isset($_POST['update'])){
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
     <style>
+        /* RESET CSS GLOBAL */
         * { margin: 0; padding: 0; box-sizing: border-box; text-decoration: none; }
+        
+        /* Reset html dan body standar */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+        }
         
         body {
             font-family: 'Poppins', sans-serif;
             background-image: url('asset/bg_kedua.png');
-            background-size: cover;
-            background-position: center;
+            
+            /* BACKGROUND FIX */
+            background-attachment: fixed; 
+            background-size: cover; 
+            background-position: center; 
             background-repeat: no-repeat;
+            
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
+            display: flex; flex-direction: column;
         }
 
+        /* --- NAVBAR STYLES (Hamburger Ready) --- */
         nav {
             background-color: #2F9E58;
+            padding: 15px 50px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            position: sticky; top: 0; z-index: 1000;
             display: flex; justify-content: space-between; align-items: center;
-            padding: 20px 50px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
         }
-        .nav-left { display: flex; align-items: center; gap: 40px; }
-        .logo { font-size: 24px; font-weight: 800; color: #ffea00ff; display: flex; align-items: center; }
-        .logo-img { height: 50px; width: auto; margin-right: 5px; vertical-align: middle; }
-        
-        .nav-links a, .nav-right a, .nav-right span {
-            color: #1a2e35; font-weight: 600; font-size: 16px; transition: color 0.3s;
-        }
-        .nav-links a { margin-right: 25px; } .nav-right a { margin-left: 20px; }
-        .nav-links a:hover, .nav-right a:hover { color: #fff; }
 
+        .logo { font-size: 24px; font-weight: 800; color: #ffea00ff; display: flex; align-items: center; }
+        .logo-img { height: 40px; width: auto; margin-right: 5px; }
+
+        /* Tombol Hamburger */
+        .hamburger {
+            display: none;
+            font-size: 28px;
+            color: white;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Menu Container */
+        .nav-menu {
+            display: flex; align-items: center; gap: 30px; width: auto;
+        }
+
+        .nav-links a, .nav-user a, .nav-user span {
+            color: #1a2e35; font-weight: 600; font-size: 16px; transition: color 0.3s; margin: 0 10px;
+        }
+        .nav-links a:hover, .nav-user a:hover { color: #fff; }
+
+        /* --- EDIT PAGE STYLES --- */
         .edit-container {
             flex: 1; display: flex; justify-content: center; align-items: center; padding: 40px 20px;
         }
@@ -112,7 +148,7 @@ if(isset($_POST['update'])){
         }
 
         .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; font-weight: 500; margin-bottom: 8px; font-size: 15px; color: #1a2e35; }
+        .form-group label { display: block; font-weight: 500; margin-bottom: 8px; font-size: 15px; color: white; /* Label jadi putih biar kontras */ }
 
         .form-control {
             width: 100%; padding: 12px 20px; border-radius: 50px; border: none;
@@ -132,10 +168,12 @@ if(isset($_POST['update'])){
         .btn-update { 
             background-color: #3CCF68; color: white; 
             width: 100%;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         } 
         
         .btn:hover { transform: translateY(-2px); opacity: 0.9; }
 
+        /* MODAL POPUP */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.5); display: flex; justify-content: center; align-items: center;
@@ -156,24 +194,54 @@ if(isset($_POST['update'])){
             padding: 10px 30px; border-radius: 50px; border: none; font-weight: 600; cursor: pointer; text-decoration: none; display: inline-block; font-family: 'Poppins', sans-serif;
         }
         .btn-green { background-color: #3CCF68; color: white; }
+
+        /* --- MEDIA QUERIES (Responsif HP) --- */
+        @media (max-width: 768px) {
+            nav { padding: 15px 20px; }
+            .hamburger { display: block; }
+            
+            /* Navbar Mobile Logic */
+            .nav-menu {
+                display: none; width: 100%; flex-direction: column;
+                background-color: #258548; margin-top: 15px; padding: 20px;
+                border-radius: 10px; gap: 20px; text-align: center;
+            }
+            .nav-menu.active { display: flex; }
+            .nav-links, .nav-user { display: flex; flex-direction: column; gap: 15px; width: 100%; }
+            .nav-links a, .nav-user a, .nav-user span { color: white; display: block; padding: 5px; }
+
+            /* Edit Page Mobile */
+            .edit-container { padding: 30px 15px; }
+            .card-edit { padding: 30px 20px; }
+            .card-edit h2 { font-size: 22px; margin-top: 30px; /* Biar ga nabrak tombol back */ }
+        }
+
     </style>
 </head>
 <body>
 
     <nav>
-        <div class="nav-left">
-             <a href="index.php" class="logo">
-            <img src="asset/logofix.png" class="logo-img"> BorneoPedia</a>
+        <a href="index.php" class="logo">
+            <img src="asset/logofix.png" class="logo-img"> BorneoPedia
+        </a>
+
+        <button class="hamburger" onclick="toggleMenu()">
+            ☰
+        </button>
+
+        <div class="nav-menu" id="navMenu">
             <div class="nav-links">
                 <a href="index.php">Home</a>
                 <a href="about.php">About Us</a>
                 <a href="contents.php">Contents</a>
             </div>
-        </div>
-        <div class="nav-right">
-            <span>Hi, <?php echo $_SESSION['username']; ?></span>
-            <a href="upload.php">Upload +</a>
-            <a href="logout.php">Logout</a>
+            
+            <div class="nav-user">
+                <!-- <span style="border-top: 1px solid rgba(255,255,255,0.2); padding-top:10px; display:block;"></span> -->
+                <span>Hi, <?php echo $_SESSION['username']; ?></span>
+                <a href="upload.php" style="background:white; color:#2F9E58; padding:5px 15px; border-radius:20px;">Upload +</a>
+                <a href="logout.php" style="color:#ffcccc;">Logout</a>
+            </div>
         </div>
     </nav>
 
@@ -214,7 +282,7 @@ if(isset($_POST['update'])){
 
                 <div class="form-group">
                     <label>Info lengkap</label>
-                    <textarea name="informasi" class="form-control" rows="4" required><?php echo htmlspecialchars($data['informasi']); ?></textarea>
+                    <textarea name="informasi" class="form-control" rows="5" required><?php echo htmlspecialchars($data['informasi']); ?></textarea>
                 </div>
 
                 <div class="button-group">
@@ -237,6 +305,14 @@ if(isset($_POST['update'])){
         </div>
     </div>
     <?php endif; ?>
+
+    <script>
+        // Toggle Hamburger
+        function toggleMenu() {
+            var menu = document.getElementById("navMenu");
+            menu.classList.toggle("active");
+        }
+    </script>
 
 </body>
 </html>

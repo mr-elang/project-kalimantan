@@ -20,77 +20,93 @@ if(isset($_GET['cari'])){
     <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
 
     <style>
+        /* RESET CSS */
         * { margin: 0; padding: 0; box-sizing: border-box; text-decoration: none; }
         
         body {
             font-family: 'Poppins', sans-serif;
             background-image: url('asset/bg_kedua.png');
-            
-            /* Background Fix: Supaya gambar background diam dan tidak zoom aneh saat scroll */
             background-attachment: fixed; 
             background-size: cover; 
             background-position: center; 
             background-repeat: no-repeat;
-            
             min-height: 100vh;
             display: flex; flex-direction: column;
         }
 
+        /* --- NAVBAR STYLES (Didesain Ulang untuk Hamburger) --- */
         nav {
             background-color: #2F9E58;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 20px 50px; 
+            padding: 15px 50px; 
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            
-            /* Navbar Fix: Supaya navbar nempel di atas */
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+            position: sticky; top: 0; z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap; /* Penting agar menu bisa turun ke bawah */
         }
 
-        .nav-left { display: flex; align-items: center; gap: 40px; }
         .logo { font-size: 24px; font-weight: 800; color: #ffea00ff; display: flex; align-items: center; }
-        .logo-img { height: 50px; width: auto; margin-right: 5px; vertical-align: middle; }
-        
-        .nav-links a, .nav-right a, .nav-right span {
-            color: #1a2e35; font-weight: 600; font-size: 16px; transition: color 0.3s;
-        }
-        .nav-links a { margin-right: 25px; } .nav-right a { margin-left: 20px; }
-        .nav-links a:hover, .nav-right a:hover { color: #fff; }
+        .logo-img { height: 40px; width: auto; margin-right: 5px; }
 
+        /* Tombol Hamburger (Default: Sembunyi di Laptop) */
+        .hamburger {
+            display: none; /* Sembunyi di layar besar */
+            font-size: 28px;
+            color: white;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Wadah Menu (Links + User Actions) */
+        .nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 30px;
+            width: auto;
+        }
+
+        .nav-links a, .nav-user a, .nav-user span {
+            color: #1a2e35; font-weight: 600; font-size: 16px; transition: color 0.3s; margin: 0 10px;
+        }
+        .nav-links a:hover, .nav-user a:hover { color: #fff; }
+
+        /* --- CONTENT STYLES --- */
         .content-container {
-            flex: 1; padding: 50px 50px; display: flex; flex-direction: column; align-items: center;
+            flex: 1; padding: 40px 50px; display: flex; flex-direction: column; align-items: center;
         }
 
         .content-container h1 {
-            font-family: 'Poppins', serif; color: #ffff; font-size: 50px; margin-bottom: 30px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            font-family: 'Poppins', serif; color: #ffff; font-size: 42px; margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5); text-align: center;
         }
 
+        /* Search Box */
         .search-box {
             background: white; width: 100%; max-width: 600px;
             border-radius: 50px; padding: 5px; display: flex;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 50px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05); margin-bottom: 40px;
         }
         .search-box input {
-            flex: 1; border: none; outline: none; padding: 15px 25px;
-            border-radius: 50px; font-family: 'Poppins', sans-serif; font-size: 16px;
+            flex: 1; border: none; outline: none; padding: 12px 25px;
+            border-radius: 50px; font-family: 'Poppins', sans-serif; font-size: 16px; min-width: 0;
         }
         .search-box button {
             background-color: #3CCF68; color: white; border: none;
-            padding: 10px 40px; border-radius: 50px; font-weight: 600; cursor: pointer;
+            padding: 10px 30px; border-radius: 50px; font-weight: 600; cursor: pointer; white-space: nowrap;
         }
         .search-box button:hover { background-color: #2eb858; }
 
+        /* Grid & Card */
         .grid-container {
-            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 30px; width: 100%; max-width: 1200px;
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px; width: 100%; max-width: 1200px;
         }
 
         .card {
-            background: white; border-radius: 20px; overflow: hidden;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.05); transition: transform 0.3s;
-            display: flex; flex-direction: column;
+            background: white; border-radius: 15px; overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05); transition: transform 0.3s;
+            display: flex; flex-direction: column; height: 100%;
         }
         .card:hover { transform: translateY(-5px); }
         .card-img { width: 100%; height: 200px; object-fit: cover; background-color: #eee; }
@@ -102,23 +118,67 @@ if(isset($_GET['cari'])){
             border-radius: 20px; font-size: 12px; font-weight: 600;
             align-self: flex-start; margin-bottom: 10px;
         }
-        .card-title { font-family: 'Merriweather', serif; font-size: 18px; color: #1a2e35; margin-bottom: 10px; }
+        .card-title { font-family: 'Merriweather', serif; font-size: 18px; color: #1a2e35; margin-bottom: 10px; line-height: 1.4;}
         .card-desc {
             font-size: 14px; color: #666; margin-bottom: 20px;
             display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; flex: 1;
         }
         
-        /* Style Tombol Baca Selengkapnya */
         .btn-detail {
-            text-align: center; background-color: #3CCF68; color: white; padding: 12px;
-            border-radius: 50px; font-size: 14px; font-weight: 700; margin-top: auto;
-            display: block; 
+            text-align: center; background-color: #3CCF68; color: white; padding: 10px;
+            border-radius: 50px; font-size: 14px; font-weight: 700; margin-top: auto; display: block; 
         }
         .btn-detail:hover { background-color: #258548; }
 
         .empty-msg { 
             color: #fff; font-style: italic; margin-top: 20px; 
-            background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 10px;
+            background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 10px; text-align: center;
+        }
+
+        /* --- MEDIA QUERIES (Mobile Responsiveness) --- */
+        @media (max-width: 768px) {
+            nav { padding: 15px 20px; }
+            
+            /* Tampilkan tombol Hamburger */
+            .hamburger { display: block; }
+
+            /* Sembunyikan Menu secara default di HP */
+            .nav-menu {
+                display: none; /* Hilang dulu */
+                width: 100%;
+                flex-direction: column;
+                background-color: #258548; /* Warna latar menu dropdown */
+                margin-top: 15px;
+                padding: 20px;
+                border-radius: 10px;
+                gap: 20px;
+                text-align: center;
+            }
+
+            /* Class ini akan ditambahkan lewat JavaScript saat tombol diklik */
+            .nav-menu.active {
+                display: flex; /* Munculkan menu */
+            }
+
+            .nav-links, .nav-user {
+                display: flex;
+                flex-direction: column;
+                gap: 15px;
+                width: 100%;
+            }
+
+            .nav-links a, .nav-user a, .nav-user span {
+                color: white; /* Ubah warna teks jadi putih biar kontras */
+                display: block;
+                padding: 5px;
+            }
+            
+            /* Penyesuaian Konten Lain */
+            .content-container { padding: 30px 20px; }
+            .content-container h1 { font-size: 32px; }
+            .search-box { width: 100%; flex-direction: column; padding: 10px; border-radius: 20px; }
+            .search-box input { width: 100%; margin-bottom: 10px; text-align: center; }
+            .search-box button { width: 100%; }
         }
 
     </style>
@@ -126,24 +186,31 @@ if(isset($_GET['cari'])){
 <body>
 
     <nav>
-        <div class="nav-left">
-             <a href="index.php" class="logo">
-            <img src="asset/logofix.png" class="logo-img"> BorneoPedia</a>
+        <a href="index.php" class="logo">
+            <img src="asset/logofix.png" class="logo-img"> BorneoPedia
+        </a>
+
+        <button class="hamburger" onclick="toggleMenu()">
+            ☰ </button>
+
+        <div class="nav-menu" id="navMenu">
             <div class="nav-links">
                 <a href="index.php">Home</a>
                 <a href="about.php">About Us</a>
                 <a href="contents.php">Contents</a>
             </div>
-        </div>
-        <div class="nav-right">
-            <?php if(isset($_SESSION['status']) && $_SESSION['status'] == 'login'): ?>
-                <span>Hi, <?php echo $_SESSION['username']; ?></span>
-                <a href="upload.php">Upload +</a>
-                <a href="logout.php">Logout</a>
-            <?php else: ?>
-                <a href="login.php">Login</a>
-                <a href="register.php">Daftar</a>
-            <?php endif; ?>
+            
+            <div class="nav-user">
+                <?php if(isset($_SESSION['status']) && $_SESSION['status'] == 'login'): ?>
+                    <!-- <span style="border-top: 1px solid rgba(255,255,255,0.2); padding-top:10px; display:block;"></span> <span>Hi, <?php echo $_SESSION['username']; ?></span> -->
+                    <a href="upload.php" style="background:white; color:#2F9E58; padding:5px 15px; border-radius:20px;">Upload +</a>
+                    <a href="logout.php" style="color:#ffcccc;">Logout</a>
+                <?php else: ?>
+                    <!-- <span style="border-top: 1px solid rgba(255,255,255,0.2); padding-top:10px; display:block;"></span> -->
+                    <a href="login.php">Login</a>
+                    <a href="register.php" style="background:white; color:#2F9E58; padding:5px 15px; border-radius:20px;">Daftar</a>
+                <?php endif; ?>
+            </div>
         </div>
     </nav>
 
@@ -177,6 +244,14 @@ if(isset($_GET['cari'])){
             <?php endif; ?>
         </div>
     </main>
+
+    <script>
+        function toggleMenu() {
+            var menu = document.getElementById("navMenu");
+            // Jika menu punya class 'active', hapus. Jika tidak, tambahkan.
+            menu.classList.toggle("active");
+        }
+    </script>
 
 </body>
 </html>

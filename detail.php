@@ -62,54 +62,52 @@ $query_komen = mysqli_query($conn, "SELECT komentar.*, users.username
         /* RESET CSS GLOBAL */
         * { margin: 0; padding: 0; box-sizing: border-box; text-decoration: none; }
         
-        /* FIX WHITE SPACE: Reset html dan body agar memenuhi layar tanpa celah */
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-        }
-
         body {
             font-family: 'Poppins', sans-serif;
             background-image: url('asset/bg_kedua.png');
-            
-            /* BACKGROUND FIX: Agar background diam dan tidak zoom aneh */
             background-attachment: fixed; 
             background-size: cover; 
             background-position: center; 
             background-repeat: no-repeat;
-            
-            /* Pastikan body minimal setinggi layar */
             min-height: 100vh;
-            
             display: flex; flex-direction: column;
         }
 
-        /* NAVBAR STICKY */
+        /* --- NAVBAR STYLES (Hamburger Ready) --- */
         nav {
             background-color: #2F9E58;
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 20px 50px; 
+            padding: 15px 50px; 
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            
-            /* Agar nempel di atas */
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+            position: sticky; top: 0; z-index: 1000;
+            display: flex; justify-content: space-between; align-items: center;
+            flex-wrap: wrap;
         }
 
-        .nav-left { display: flex; align-items: center; gap: 40px; }
         .logo { font-size: 24px; font-weight: 800; color: #ffea00ff; display: flex; align-items: center; }
-        .logo-img { height: 50px; width: auto; margin-right: 5px; vertical-align: middle; }
-        
-        .nav-links a, .nav-right a, .nav-right span {
-            color: #1a2e35; font-weight: 600; font-size: 16px; transition: color 0.3s;
-        }
-        .nav-links a { margin-right: 25px; } .nav-right a { margin-left: 20px; }
-        .nav-links a:hover, .nav-right a:hover { color: #fff; }
+        .logo-img { height: 40px; width: auto; margin-right: 5px; }
 
-        /* CONTAINER UTAMA */
+        /* Tombol Hamburger */
+        .hamburger {
+            display: none;
+            font-size: 28px;
+            color: white;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* Menu Container */
+        .nav-menu {
+            display: flex; align-items: center; gap: 30px; width: auto;
+        }
+
+        .nav-links a, .nav-user a, .nav-user span {
+            color: #1a2e35; font-weight: 600; font-size: 16px; transition: color 0.3s; margin: 0 10px;
+        }
+        .nav-links a:hover, .nav-user a:hover { color: #fff; }
+
+
+        /* --- DETAIL PAGE STYLES --- */
         .detail-container {
             flex: 1; 
             padding: 50px 20px; 
@@ -150,13 +148,13 @@ $query_komen = mysqli_query($conn, "SELECT komentar.*, users.username
             border-radius: 50px; font-weight: 600; font-size: 13px; text-transform: uppercase;
         }
 
-        h1 { font-family: 'Merriweather', serif; font-size: 36px; color: #1a2e35; margin-bottom: 25px; }
+        h1 { font-family: 'Merriweather', serif; font-size: 36px; color: #1a2e35; margin-bottom: 25px; line-height: 1.3; }
 
         .content-text {
             font-size: 16px; line-height: 1.8; color: #444; text-align: justify; margin-bottom: 40px; white-space: pre-line;
         }
 
-        .action-area { border-top: 1px solid #eee; padding-top: 25px; display: flex; gap: 15px; }
+        .action-area { border-top: 1px solid #eee; padding-top: 25px; display: flex; gap: 15px; flex-wrap: wrap; }
 
         .btn {
             padding: 12px 25px; border-radius: 50px; font-weight: 600; font-size: 14px;
@@ -177,12 +175,12 @@ $query_komen = mysqli_query($conn, "SELECT komentar.*, users.username
         .input-comment {
             flex: 1; padding: 15px 25px; border-radius: 50px; border: 1px solid #ddd;
             background-color: white; font-family: 'Poppins', sans-serif; font-size: 14px;
-            outline: none; box-shadow: 0 5px 15px rgba(0,0,0,0.03);
+            outline: none; box-shadow: 0 5px 15px rgba(0,0,0,0.03); min-width: 0;
         }
         .input-comment:focus { border-color: #00ced1; }
 
         .btn-send {
-            background-color: #00ced1; color: white; border: none; width: 50px; height: 50px;
+            background-color: #00ced1; color: white; border: none; width: 50px; height: 50px; flex-shrink: 0;
             border-radius: 50px; display: flex; justify-content: center; align-items: center;
             cursor: pointer; box-shadow: 0 4px 10px rgba(0, 206, 209, 0.3); transition: background 0.3s;
         }
@@ -213,29 +211,74 @@ $query_komen = mysqli_query($conn, "SELECT komentar.*, users.username
         .btn-red { background-color: #ff4d4d; color: white; }
         .btn-red:hover { background-color: #cc0000; }
 
+        /* --- MEDIA QUERIES (Mobile Responsiveness) --- */
+        @media (max-width: 768px) {
+            nav { padding: 15px 20px; }
+            .hamburger { display: block; }
+            
+            /* Navbar Mobile Logic */
+            .nav-menu {
+                display: none; 
+                width: 100%;
+                flex-direction: column;
+                background-color: #258548;
+                margin-top: 15px;
+                padding: 20px;
+                border-radius: 10px;
+                gap: 20px;
+                text-align: center;
+            }
+            .nav-menu.active { display: flex; }
+            .nav-links, .nav-user { display: flex; flex-direction: column; gap: 15px; width: 100%; }
+            .nav-links a, .nav-user a, .nav-user span { color: white; display: block; padding: 5px; }
+
+            /* Detail Page Mobile Adjustments */
+            .detail-container { padding: 20px 15px; }
+            .card-detail { margin-bottom: 30px; }
+            .detail-img { height: 250px; } /* Gambar lebih pendek di HP */
+            .detail-body { padding: 25px; } /* Padding lebih kecil */
+            h1 { font-size: 28px; } /* Judul lebih kecil */
+            .content-text { font-size: 15px; }
+            
+            /* Komentar */
+            .comment-section { padding: 25px; }
+            .comment-form { flex-direction: column; }
+            .input-comment { width: 100%; }
+            .btn-send { width: 100%; border-radius: 15px; }
+        }
+
     </style>
 </head>
 <body>
 
     <nav>
-        <div class="nav-left">
-             <a href="index.php" class="logo">
-            <img src="asset/logofix.png" class="logo-img"> BorneoPedia</a>
+        <a href="index.php" class="logo">
+            <img src="asset/logofix.png" class="logo-img"> BorneoPedia
+        </a>
+
+        <button class="hamburger" onclick="toggleMenu()">
+            ☰
+        </button>
+
+        <div class="nav-menu" id="navMenu">
             <div class="nav-links">
                 <a href="index.php">Home</a>
                 <a href="about.php">About Us</a>
                 <a href="contents.php">Contents</a>
             </div>
-        </div>
-        <div class="nav-right">
-            <?php if(isset($_SESSION['status']) && $_SESSION['status'] == 'login'): ?>
-                <span>Hi, <?php echo $_SESSION['username']; ?></span>
-                <a href="upload.php">Upload +</a>
-                <a href="logout.php">Logout</a>
-            <?php else: ?>
-                <a href="login.php">Login</a>
-                <a href="register.php">Daftar</a>
-            <?php endif; ?>
+            
+            <div class="nav-user">
+                <?php if(isset($_SESSION['status']) && $_SESSION['status'] == 'login'): ?>
+                    <!-- <span style="border-top: 1px solid rgba(255,255,255,0.2); padding-top:10px; display:block;"></span> -->
+                    <span>Hi, <?php echo $_SESSION['username']; ?></span>
+                    <a href="upload.php" style="background:white; color:#2F9E58; padding:5px 15px; border-radius:20px;">Upload +</a>
+                    <a href="logout.php" style="color:#ffcccc;">Logout</a>
+                <?php else: ?>
+                    <!-- <span style="border-top: 1px solid rgba(255,255,255,0.2); padding-top:10px; display:block;"></span> -->
+                    <a href="login.php">Login</a>
+                    <a href="register.php" style="background:white; color:#2F9E58; padding:5px 15px; border-radius:20px;">Daftar</a>
+                <?php endif; ?>
+            </div>
         </div>
     </nav>
 
@@ -267,7 +310,6 @@ $query_komen = mysqli_query($conn, "SELECT komentar.*, users.username
                 <div class="action-area">
                     <?php if(isset($_SESSION['user_id']) && $_SESSION['user_id'] == $data['user_id']): ?>
                         <a href="edit.php?id=<?php echo $data['id']; ?>" class="btn btn-edit">Edit Artikel</a>
-                        
                         <a href="#" onclick="bukaPopupHapus(); return false;" class="btn btn-delete">Hapus</a>
                     <?php endif; ?>
                 </div>
@@ -320,6 +362,13 @@ $query_komen = mysqli_query($conn, "SELECT komentar.*, users.username
     </div>
 
     <script>
+        // Toggle Hamburger
+        function toggleMenu() {
+            var menu = document.getElementById("navMenu");
+            menu.classList.toggle("active");
+        }
+
+        // Toggle Modal Hapus
         function bukaPopupHapus() {
             document.getElementById('popupHapus').classList.add('modal-show');
         }
