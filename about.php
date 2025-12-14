@@ -155,7 +155,7 @@ session_start();
                 <div class="photo-box">
                     <img src="asset/teams/rinaldi.jpg" alt="Rinaldi">
                 </div>
-                <div class="member-info">Rinaldi - H1D024070</div>
+                <div class="member-info">Rinaldi - H1D024065</div>
                 <div class="member-info">Frontend</div>
             </div>
 
@@ -171,7 +171,7 @@ session_start();
                 <div class="photo-box">
                     <img src="asset/teams/elang.jpg" alt="Elang">
                 </div>
-                <div class="member-info">Elang - H1D024065</div>
+                <div class="member-info">Elang - H1D024070</div>
                 <div class="member-info">Backend</div>
             </div>
 
